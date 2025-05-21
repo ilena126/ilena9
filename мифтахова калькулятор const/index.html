@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Repair Cost Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 12px #ccc;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1em;
+  }
+  fieldset {
+    margin-bottom: 1.5em;
+    border: 1px solid #ccc;
+    padding: 1em;
+    border-radius: 6px;
+  }
+  legend {
+    font-weight: bold;
+    padding: 0 8px;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.3em;
+    cursor: pointer;
+  }
+  input[type=range] {
+    width: 100%;
+  }
+  .output {
+    font-weight: bold;
+    margin-top: 0.5em;
+    text-align: center;
+  }
+  .result {
+    background: #eef;
+    padding: 1em;
+    border-radius: 6px;
+    margin-top: 1em;
+    font-size: 1.1em;
+  }
+  button {
+    width: 100%;
+    padding: 0.85em;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 6px;
+    background-color: #0066cc;
+    color: white;
+    cursor: pointer;
+  }
+  button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+  }
+  input[type="tel"] {
+    width: 100%;
+    padding: 0.5em;
+    font-size: 1em;
+    margin-top: 0.3em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+</style>
+</head>
+<body>
+
+<h1>Repair Cost Calculator</h1>
+
+<form id="repairForm">
+
+  <!-- Type of work -->
+  <fieldset>
+    <legend>Type of Work</legend>
+    <label><input type="radio" name="workType" value="basic" data-cost="3000" checked /> Basic Repair</label>
+    <label><input type="radio" name="workType" value="cosmetic" data-cost="4500" /> Cosmetic Repair</label>
+    <label><input type="radio" name="workType" value="capital" data-cost="7000" /> Capital Repair</label>
+  </fieldset>
+
+  <!-- Type of Real Estate -->
+  <fieldset>
+    <legend>Type of Real Estate</legend>
+    <label><input type="radio" name="estateType" value="apartment" data-multiplier="1" checked /> Apartment</label>
+    <label><input type="radio" name="estateType" value="house" data-multiplier="1.3" /> House</label>
+    <label><input type="radio" name="estateType" value="commercial" data-multiplier="1.5" /> Commercial</label>
+  </fieldset>
+
+  <!-- Number of Rooms -->
+  <fieldset>
+    <legend>Number of Rooms</legend>
+    <label><input type="radio" name="rooms" value="1" data-multiplier="1" checked /> 1 Room</label>
+    <label><input type="radio" name="rooms" value="2" data-multiplier="1.2" /> 2 Rooms</label>
+    <label><input type="radio" name="rooms" value="3" data-multiplier="1.4" /> 3 Rooms</label>
+    <label><input type="radio" name="rooms" value="4plus" data-multiplier="1.6" /> 4+ Rooms</label>
+  </fieldset>
+
+  <!-- Area in m2 -->
+  <fieldset>
+    <legend>Area (m²)</legend>
+    <input type="range" id="area" name="area" min="20" max="300" step="1" value="50" />
+    <div class="output">Area: <span id="areaValue">50</span> m²</div>
+  </fieldset>
+
+  <!-- Repair period -->
+  <fieldset>
+    <legend>Repair Period (days)</legend>
+    <input type="range" id="period" name="period" min="5" max="120" step="1" value="30" />
+    <div class="output">Period: <span id="periodValue">30</span> days</div>
+  </fieldset>
+
+  <!-- Results -->
+  <div class="result" id="results">
+    <div>Total Cost: <span id="totalCost">0</span> ₽</div>
+    <div>10% Discount Price: <span id="discountCost">0</span> ₽</div>
+  </div>
+
+  <!-- Phone number & order button -->
+  <fieldset>
+    <legend>Order a Call</legend>
+    <label for="phone">Your Phone Number:</label>
+    <input type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" pattern="^\+7\s?\(?\d{3}\)?\s?\d{3}[- ]?\d{2}[- ]?\d{2}$" required />
+  </fieldset>
+
+  <button type="submit" id="orderBtn" disabled>Order a Call</button>
+</form>
+
+<script>
+  const form = document.getElementById('repairForm');
+  const areaSlider = document.getElementById('area');
+  const periodSlider = document.getElementById('period');
+  const areaValue = document.getElementById('areaValue');
+  const periodValue = document.getElementById('periodValue');
+  const totalCostEl = document.getElementById('totalCost');
+  const discountCostEl = document.getElementById('discountCost');
+  const phoneInput = document.getElementById('phone');
+  const orderBtn = document.getElementById('orderBtn');
+
+  // Update displayed slider values
+  areaSlider.addEventListener('input', () => {
+    areaValue.textContent = areaSlider.value;
+    calculateCost();
+  });
+  periodSlider.addEventListener('input', () => {
+    periodValue.textContent = periodSlider.value;
+    calculateCost();
+  });
+
+  // Enable order button only if phone is valid
+  phoneInput.addEventListener('input', () => {
+    orderBtn.disabled = !phoneInput.checkValidity();
+  });
+
+  // Recalculate cost on changes in radio buttons
+  form.querySelectorAll('input[type=radio]').forEach(radio => {
+    radio.addEventListener('change', calculateCost);
+  });
+
+  // Core calculation function
+  function calculateCost() {
+    // Get selected type of work base cost
+    const workType = form.elements['workType'];
+    const selectedWork = [...workType].find(r => r.checked);
+    const baseCost = Number(selectedWork.dataset.cost);
+
+    // Get real estate multiplier
+    const estateType = form.elements['estateType'];
+    const selectedEstate = [...estateType].find(r => r.checked);
+    const estateMultiplier = Number(selectedEstate.dataset.multiplier);
+
+    // Get rooms multiplier
+    const rooms = form.elements['rooms'];
+    const selectedRooms = [...rooms].find(r => r.checked);
+    const roomsMultiplier = Number(selectedRooms.dataset.multiplier);
+
+    // Area in m2
+    const area = Number(areaSlider.value);
+
+    // Repair period (for info only, not affecting cost)
+    const period = Number(periodSlider.value);
+
+    // Calculate total cost:
+    // Formula: baseCost * estateMultiplier * roomsMultiplier * area
+    const totalCost = baseCost * estateMultiplier * roomsMultiplier * area;
+
+    // Calculate 10% discount price
+    const discountCost = totalCost * 0.9;
+
+    // Display results rounded to integer rubles
+    totalCostEl.textContent = totalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    discountCostEl.textContent = discountCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+
+  // Initial calculation
+  calculateCost();
+
+  // Form submission handler
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!phoneInput.checkValidity()) {
+      alert('Please enter a valid phone number in the format +7 (xxx) xxx-xx-xx');
+      phoneInput.focus();
+      return;
+    }
+    alert(`Thank you! Your call order has been received.\nWe will contact you at ${phoneInput.value}.`);
+    form.reset();
+    areaValue.textContent = areaSlider.value = 50;
+    periodValue.textContent = periodSlider.value = 30;
+    totalCostEl.textContent = '0';
+    discountCostEl.textContent = '0';
+    orderBtn.disabled = true;
+    calculateCost();
+  });
+</script>
+
+</body>
+</html>
