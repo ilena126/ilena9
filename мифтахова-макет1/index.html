@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мифтахова</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="overlay-bg"></div>
+
+
+  <div class="main-modal">
+    <h2 class="modal-heading">Узнайте цену <span class="accent-text">вашей кухни</span></h2>
+
+    <div class="option-section">
+      <h3 class="section-heading">Стиль:</h3>
+      <div class="style-grid">
+        <div class="style-option">
+          <img src="./img/modern.png" alt="Современный стиль" class="style-img">
+          <p>Современный стиль</p>
+        </div>
+        <div class="style-option">
+          <img src="./img/loft.png" alt="Кухни Лофт" class="style-img">
+          <p>Кухни Лофт</p>
+        </div>
+        <div class="style-option">
+          <img src="./img/classic.png" alt="Классический стиль" class="style-img">
+          <p>Классический стиль</p>
+        </div>
+        <div class="style-option">
+          <img src="./img/other.png" alt="Другое" class="style-img">
+          <p>Другое</p>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="option-section">
+      <h3 class="section-heading">Форма:</h3>
+      <div class="form-grid">
+        <div class="form-option">
+          <img src="./img/1.png" alt="Прямая кухня" class="form-icon">
+          <p>Прямая кухня</p>
+        </div>
+        <div class="form-option">
+          <img src="./img/2.png" alt="Угловая кухня" class="form-icon">
+          <p>Угловая кухня</p>
+        </div>
+        <div class="form-option">
+          <img src="./img/3.png" alt="П-образная кухня" class="form-icon">
+          <p>П-образная кухня</p>
+        </div>
+        <div class="form-option">
+          <img src="./img/4.png" alt="Параллельная кухня" class="form-icon">
+          <p>Параллельная кухня</p>
+        </div>
+        <div class="form-option">
+          <img src="./img/5.png" alt="Кухня с островом" class="form-icon">
+          <p>Кухня с островом</p>
+        </div>
+        <div class="form-option">
+          <img src="./img/6.png" class="form-icon">
+          <p>Другие формы</p>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="option-section">
+      <h3 class="section-heading">Площадь кухни:</h3>
+      <div class="size-grid">
+        <button class="size-btn">До 5 м²</button>
+        <button class="size-btn">До 8 м²</button>
+        <button class="size-btn">До 15 м²</button>
+        <button class="size-btn">Другое</button>
+      </div>
+    </div>
+
+
+    <div class="option-section">
+      <p>Оставьте свой номер телефона сейчас и наш дизайнер свяжется с Вами в ближайшее время!</p>
+      <button class="phone-btn">Указать номер телефона</button>
+      <button class="submit-btn">Рассчитать стоимость</button>
+    </div>
+  </div>
+
+
+  <div id="phone-modal" class="phone-modal hidden">
+    <div class="phone-content">
+      <h2 class="modal-heading">Введите ваш номер телефона</h2>
+      <input type="tel" placeholder="Номер телефона" class="phone-input">
+      <button class="confirm-btn">Подтвердить</button>
+      <button class="cancel-btn">Отмена</button>
+    </div>
+  </div>
+
+
+  <div id="result-modal" class="result-modal hidden">
+    <div class="result-content">
+      <h2 class="modal-heading">Результат расчета</h2>
+      <p class="result-text">Стоимость вашей кухни: <span id="total-cost">0 ₽</span></p>
+      <button class="close-btn">Закрыть</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
