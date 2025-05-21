@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Loan Calculator - Стоимость вашей <span style="color:red;">кухни</span></title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 2rem;
+    background: #f9f9f9;
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  .highlight {
+    color: red;
+    font-weight: 700;
+  }
+  form {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    max-width: 400px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 600;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .result {
+    margin-top: 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<h1>Калькулятор займа для <span class="highlight">вашей кухни</span></h1>
+
+<form id="loanForm">
+  <label for="kitchenCost">Стоимость вашей <span class="highlight">кухни</span> (₽):</label>
+  <input type="number" id="kitchenCost" name="kitchenCost" min="0" step="100" required />
+
+  <label for="interestRate">Годовая процентная ставка (%):</label>
+  <input type="number" id="interestRate" name="interestRate" min="0" step="0.01" required />
+
+  <label for="loanTerm">Срок займа (месяцев):</label>
+  <input type="number" id="loanTerm" name="loanTerm" min="1" step="1" required />
+
+  <button type="submit">Рассчитать</button>
+</form>
+
+<div class="result" id="result"></div>
+
+<script>
+// Рассчитать ежемесячный платёж по формуле аннуитета
+function calculateMonthlyPayment(principal, annualRatePercent, months) {
+  const monthlyRate = annualRatePercent / 100 / 12;
+  if (monthlyRate === 0) return principal / months;
+  return (
+    (principal * monthlyRate) /
+    (1 - Math.pow(1 + monthlyRate, -months))
+  );
+}
+
+document.getElementById('loanForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const kitchenCost = parseFloat(this.kitchenCost.value);
+  const interestRate = parseFloat(this.interestRate.value);
+  const loanTerm = parseInt(this.loanTerm.value, 10);
+
+  if (kitchenCost <= 0 || interestRate < 0 || loanTerm <= 0) {
+    document.getElementById('result').textContent = 'Пожалуйста, введите корректные значения.';
+    return;
+  }
+
+  const monthlyPayment = calculateMonthlyPayment(kitchenCost, interestRate, loanTerm);
+  const totalPayment = monthlyPayment * loanTerm;
+  const totalInterest = totalPayment - kitchenCost;
+
+  document.getElementById('result').innerHTML = `
+    Стоимость вашей <span class="highlight">кухни</span>: <strong>${kitchenCost.toLocaleString('ru-RU')} ₽</strong><br />
+    Ежемесячный платёж: <strong>${monthlyPayment.toFixed(2)} ₽</strong><br />
+    Общая сумма выплат: <strong>${totalPayment.toFixed(2)} ₽</strong><br />
+    Переплата по процентам: <strong>${totalInterest.toFixed(2)} ₽</strong>
+  `;
+});
+</script>
+
+</body>
+</html>
